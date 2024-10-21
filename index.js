@@ -1,10 +1,21 @@
 const express = require('express');
-const path = require('path');
-const mysql = require('mysql2');
-const bodyParser = require('body-parser');
-
 const app = express();
 
+const path = require('path');
+// add template engine
+const hbs = require('express-handlebars');
+// setup template engine directory and files extension
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
+app.engine('hbs', hbs.engine({
+    extname: 'hbs',
+    defaultLayout: 'main',
+    layoutsDir: __dirname + '/views/layouts/',
+}))
+
+const mysql = require('mysql2');
+
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const con = mysql.createConnection({
