@@ -32,6 +32,16 @@ con.connect((err) => {
     console.log('Connected to the database');
 })
 
+app.get('/', (req, res) => {
+    let query = "SELECT * FROM article";
+    let articles = [];
+    con.query(query, (err, result) => {
+        if (err) throw err;
+        articles = result
+        res.render('index', { articles: articles });
+    })
+});
+
 app.listen(3003, () => {
     console.log('App is started at http://localhost:3003');
 })
