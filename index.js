@@ -59,12 +59,26 @@ app.get('/article/:slug', (req, res) => {
                 console.log("Author name found: ", authorName);
                 res.render('article', { 
                     article: article, 
-                    authorName: authorName
+                    author_name: authorName
                 });
             })
         }
     })
 })
+
+// show one authors articles
+app.get('/article/author/:id', (req, res) => {
+    let query = `SELECT * FROM article WHERE author_id = ${req.params.id}`;
+    let articles = [];
+    con.query(query, (err ,result) => {
+        if (err) throw err;
+        articles = result;
+        res.render('author', { 
+            articles: articles 
+        });
+    })
+})
+
 
 app.listen(3003, () => {
     console.log('App is started at http://localhost:3003');
