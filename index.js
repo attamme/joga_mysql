@@ -20,31 +20,13 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const articleRoutes = require('./routes/article'); // import article route
+const articleRouter = require('./routes/article'); // import article route
+const authorRouter = require('./routes/author'); // import author route
 
 // use article route
-app.use('/', articleRoutes);
-app.use('/article', articleRoutes);
+app.use('/', articleRouter);
+app.use('/author', authorRouter);
 
-// show one authors articles
-app.get('/author/:author_id', (req, res) => {
-    let query = `SELECT * FROM author WHERE id = ${req.params.author_id}`;
-    let articles
-    con.query(query, (err ,result) => {
-        if (err) throw err;
-        articles = result
-        query = `SELECT * FROM author WHERE author_id = ${req.params.author_id}`;
-        let author
-        con.query(query, (err, result) => {
-            if (err) throw err;
-            author = result
-            res.render('author', {
-                author: author,
-                articles: articles
-            });
-        });
-    })
-})
 
 
 app.listen(3003, () => {
