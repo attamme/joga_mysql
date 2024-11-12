@@ -20,67 +20,27 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const con = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'qwerty',
-    database: 'joga_mysql'
-});
+const articleRoutes = require('./routes/article'); // import article route
 
-con.connect((err) => {
-    if (err) throw err; 
-    console.log('Connected to the database');
-})
-
-// show all articles - index page
-app.get('/', (req, res) => {
-    let query = "SELECT * FROM article";
-    let articles = [];
-    con.query(query, (err, result) => {
-        if (err) throw err;
-        articles = result
-        res.render('index', { articles: articles });
-    })
-});
-
-// show article by this slug
-app.get('/article/:slug', (req, res) => {
-    let query = `SELECT * FROM article WHERE slug = '${req.params.slug}'`;
-    let article
-    con.query(query, (err ,result) => {
-        if (err) throw err;
-        article = result[0];
-        if (article.author_id) {
-            let authorQuery = `SELECT name FROM author WHERE id = ${article.author_id}`;
-            con.query(authorQuery, (err, authorResult) => {
-                if (err) throw err;
-                let authorName = authorResult.length > 0 ? authorResult[0].name : 'Unknown Author';
-                article.authorName = authorResult[0].name;
-                res.render('article', { 
-                    article: article, 
-                    author_name: authorName
-                });
-            })
-        }
-    })
-})
+// use article route
+app.use('/', articleRoutes);
+app.use('/article', articleRoutes);
 
 // show one authors articles
 app.get('/author/:author_id', (req, res) => {
-    const authorId = req.params.author_id;
-    const authorQuery = `SELECT * FROM author WHERE id = ${authorId}`;
-    const articlesQuery = `SELECT * FROM article WHERE author_id = ${authorId}`;
-
-    con.query(authorQuery, (err ,authorResult) => {
+    let query = `SELECT * FROM author WHERE id = ${req.params.author_id}`;
+    let articles
+    con.query(query, (err ,result) => {
         if (err) throw err;
-
-        const author = authorResult[0];
-        con.query(articlesQuery, (err, articlesResult) => {
+        articles = result
+        query = `SELECT * FROM author WHERE author_id = ${req.params.author_id}`;
+        let author
+        con.query(query, (err, result) => {
             if (err) throw err;
-
+            author = result
             res.render('author', {
-                author: authorResult,
-                articles: articlesResult
+                author: author,
+                articles: articles
             });
         });
     })
