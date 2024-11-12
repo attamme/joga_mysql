@@ -56,7 +56,6 @@ app.get('/article/:slug', (req, res) => {
                 if (err) throw err;
                 let authorName = authorResult.length > 0 ? authorResult[0].name : 'Unknown Author';
                 article.authorName = authorResult[0].name;
-                console.log("Author name found: ", authorName);
                 res.render('article', { 
                     article: article, 
                     author_name: authorName
@@ -67,14 +66,22 @@ app.get('/article/:slug', (req, res) => {
 })
 
 // show one authors articles
-app.get('/article/author/:id', (req, res) => {
-    let query = `SELECT * FROM article WHERE author_id = ${req.params.id}`;
-    let articles = [];
-    con.query(query, (err ,result) => {
+app.get('/author/:author_id', (req, res) => {
+    const authorId = req.params.author_id;
+    const authorQuery = `SELECT * FROM author WHERE id = ${authorId}`;
+    const articlesQuery = `SELECT * FROM article WHERE author_id = ${authorId}`;
+
+    con.query(authorQuery, (err ,authorResult) => {
         if (err) throw err;
-        articles = result;
-        res.render('author', { 
-            articles: articles 
+
+        const author = authorResult[0];
+        con.query(articlesQuery, (err, articlesResult) => {
+            if (err) throw err;
+
+            res.render('author', {
+                author: authorResult,
+                articles: articlesResult
+            });
         });
     })
 })
